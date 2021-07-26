@@ -365,6 +365,10 @@ module Scale
         Address32: "H256",
         Address20: "H160"
       )
+      def encode
+        index = items.to_a.index { |x| x == value.first }
+        index.to_s(16).rjust(2, "0") + value.last.encode
+      end
     end
 
     class AccountId < H256; end
