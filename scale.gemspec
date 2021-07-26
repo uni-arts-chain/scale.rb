@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Ruby SCALE Codec Library"
   spec.description = "Ruby implementation of the parity SCALE data format"
-  spec.homepage = "https://github.com/itering/scale.rb"
+  spec.homepage = "https://github.com/uni-arts-chain/scale.rb"
   spec.license = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
