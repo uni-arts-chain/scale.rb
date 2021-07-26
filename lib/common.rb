@@ -66,11 +66,13 @@ module Crypto
   end
 
   def self.blake2_128(bytes)
-    Blake2b.hex bytes, 16
+    data = bytes.bytes_to_utf8
+    Blake2b.hex data, Blake2b::Key.none, 16
   end
 
   def self.blake2_256(bytes)
-    Blake2b.hex bytes, 32
+    data = bytes.bytes_to_utf8
+    Blake2b.hex data, Blake2b::Key.none, 32
   end
 
   def self.blake2_128_concat(bytes)
