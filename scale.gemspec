@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "blake2b_rs", "~> 0.1.2"
+  spec.add_dependency "blake2b"
   spec.add_dependency "xxhash"
   spec.add_dependency "base58"
   spec.add_dependency "json", "~> 2.3.0"
