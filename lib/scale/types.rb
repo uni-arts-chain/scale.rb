@@ -368,10 +368,10 @@ module Scale
       def encode
         if value.class == Integer
           index = 1
-          index.to_s(16).rjust(2, "0") + Scale::Types.get("AccountId").new(value).encode
+          index.to_s(16).rjust(2, "0") + Scale::Types.get("Compact").new(value).encode
         elsif value.length == 66 and value[0...2] == '0x'
           index = 0
-          index.to_s(16).rjust(2, "0") + Scale::Types.get("Compact").new(value).encode
+          index.to_s(16).rjust(2, "0") + Scale::Types.get("AccountId").new(value).encode
         elsif value.length == 42
           index = 4
           index.to_s(16).rjust(2, "0") + Scale::Types.get("Address20").new(value).encode
