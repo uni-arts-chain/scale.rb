@@ -367,8 +367,15 @@ module Scale
       )
 
       def encode
-        index = self.class::ITEMS.to_a.index { |x| x.first == value.first }
-        index.to_s(16).rjust(2, "0") + value.last.encode
+        if value.class == Integer
+          index = 1
+        elsif value.length == 66 and value[0:2] == '0x'
+          index = 0
+        elsif value.length == 42
+          index = 4
+        else
+          index = self.class::ITEMS.to_a.index { |x| x.first == value.first }
+        end
       end
     end
 
