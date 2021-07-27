@@ -377,7 +377,7 @@ module Scale
           index.to_s(16).rjust(2, "0") + Scale::Types.get("Address20").new(value).encode
         else
           index = self.class::ITEMS.to_a.index { |x| x.first == value.first }
-          index.to_s(16).rjust(2, "0") + Scale::Types.get(self.class::ITEMS.[value.first]).new(value.last).encode
+          index.to_s(16).rjust(2, "0") + Scale::Types.get(self.class::ITEMS[value.first]).new(value.last).encode
         end
       end
     end
