@@ -299,9 +299,14 @@ module Scale
 
       def encode
         if self.class.const_defined? "ITEMS"
-          _items = self.class.const_get("ITEMS").to_a
-          index = _items.find_index {|_item| value.keys.first.to_sym == _item.first}
-          index.to_s(16).rjust(2, "0") + _items[index].last.new(value.values.first).encode
+          if index.blank? && value.class == ::Hash
+            _items = self.class.const_get("ITEMS").to_a
+            index = _items.find_index {|_item| value.keys.first.to_sym == _item.first}
+            index.to_s(16).rjust(2, "0") + _items[index].last.new(value.values.first).encode
+          else
+            index.to_s(16).rjust(2, "0") + value.encode
+          end
+          
         else
           self.class::VALUES.index(value).to_s(16).rjust(2, "0")
         end
