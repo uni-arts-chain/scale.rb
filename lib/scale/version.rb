@@ -1,3 +1,3 @@
 module Scale
-  VERSION = "0.2.35".freeze
+  VERSION = "0.2.37".freeze
 end
