@@ -33,56 +33,44 @@ describe Scale::Types::Metadata do
     expect(v.to_json).to eql(expected.to_json)
   end
 
-  # The data copy from polkadot-js/api about type and hasher has some errors,
-  # so I did not test these.
-  [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13].each do |v|
-  # [13].each do |v|
-    it "can decode v#{v} hex data" do
-      hex = get_metadata_hex(v)
-      scale_bytes = Scale::Bytes.new(hex)
-      metadata = Scale::Types::Metadata.decode scale_bytes
-      md = metadata.value.value[:metadata]
-      mods = md[:modules]
+  it "get scale info" do
+    hex = get_metadata_hex(14)
+    scale_bytes = Scale::Bytes.new(hex)
+    portables = Scale::Types.get("PortableRegistry").decode(scale_bytes)
+    portables_to_human = portables.to_human
+    #.{:id=>0, :type=>{:path=>["sp_core", "crypto", "AccountId32"], :params=>[], :def=>{:fields=>[{:name=>nil, :type=>1, :typeName=>"[u8; 32]", :docs=>[]}]}, :docs=>[]}}
+    portables_to_hash = {}
+    portables_to_human.each do |portable|
+      portables_to_hash[portable[:id]] = portable
+    end
+   
+    modules = Scale::Types.get("Vec<MetadataV14Module>").decode(scale_bytes).value
+    result = Scale::Types.get("MetadataV14").new(modules)
+    call_module_index = 0
+    event_module_index = 0
 
-      expected = get_metadata(v)[:metadata]["V#{v}".to_sym]
-      mods_expected = expected[:modules]
-
-      expect(metadata.version).to eql(v)
-
-      mods.each_with_index do |mod, i|
-        mod_expected = mods_expected[i]
-
-        mod[:events]&.each_with_index do |event, j|
-          event_expected = mod_expected[:events][j]
-          expect(event[:name]).to eql(event_expected[:name])
-          expect(event[:documentation]).to eql(event_expected[:documentation])
+    modules.map(&:value).each do |m|
+      if m[:calls]
+        puts 1111111111
+        variants = portables_to_hash[m[:calls]["type"].value][:type][:def][:Variant][:variants]
+        raise "call value not variant" if variants.nil?
+        puts variants.inspect
+        m[:calls] = variants
+        m[:calls].each_with_index do |call, index|
+          call[:lookup] = "%02x%02x" % [m[:index], index]
+          result.call_index[call[:lookup]] = [m, call]
         end
+      end
 
-        mod[:calls]&.each_with_index do |call, j|
-          call_expected = mod_expected[:calls][j]
-          expect(call[:name]).to eql(call_expected[:name])
-          expect(call[:documentation]).to eql(call_expected[:documentation])
-        end
 
-        if not mod[:storage].nil?
-          if mod[:storage].class.name == "Hash"
-            storages = mod[:storage][:items]
-            storages_expected = mod_expected[:storage][:items]
-          else
-            storages = mod[:storage]
-            storages_expected = mod_expected[:storage]
-          end
-
-          storages.each_with_index do |storage, j|
-            storage_expected = storages_expected[j]
-            expect(storage[:name]).to eql(storage_expected[:name])
-            expect(storage[:modifier]).to eql(storage_expected[:modifier])
-            expect(storage[:fallback]).to eql(storage_expected[:fallback])
-            expect(storage[:documentation]).to eql(storage_expected[:documentation])
-          end
+      if m[:events]
+        m[:events].each_with_index do |event, index|
+          event[:lookup] = "%02x%02x" % [module_index, index]
+          result.event_index[event[:lookup]] = [m, event]
         end
       end
     end
+    expect(portables).to eql(nil)
   end
 
 end

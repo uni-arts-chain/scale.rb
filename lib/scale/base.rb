@@ -313,7 +313,12 @@ module Scale
 
       def to_human
         if self.class.const_defined? "ITEMS"
-          @value.to_human
+          if index.nil?
+            @value.to_human
+          else
+            type = self.class.const_get("ITEMS").to_a[index][0]
+            {type => @value.to_human}
+          end
         elsif self.class.const_defined? "INNER_TYPES"
           @value.to_human
         else
