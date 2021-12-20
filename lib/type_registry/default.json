@@ -4655,10 +4655,11 @@
           "Bytes"
         ],
         [
-          "documentation",
+          "docs",
           "Vec<String>"
         ]
       ]
-    }
+    },
+    "Str": "Bytes"
   }
 }

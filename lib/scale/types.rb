@@ -1004,5 +1004,15 @@ module Scale
       )
     end
 
+    class MetadataV14ModuleConstant
+      include Struct
+      items(
+        name: "String",
+        type: 'String',
+        value: 'Bytes',
+        docs: 'Vec<String>'
+      )
+    end
+
   end
 end

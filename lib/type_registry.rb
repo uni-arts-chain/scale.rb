@@ -47,6 +47,15 @@ module Scale
       @custom_types = custom_types.stringify_keys if (not custom_types.nil?) && custom_types.class.name == "Hash"
     end
 
+    def add_custom_type custom_type
+      custom_type = custom_type.stringify_keys if (not custom_type.nil?) && custom_type.class.name == "Hash"
+      if @custom_type
+        @custom_types.merge!(custom_type)
+      else
+        @custom_types = custom_type
+      end
+    end
+
     def all_types
       all_types = {}.merge(@types)
 
