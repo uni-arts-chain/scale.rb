@@ -51,7 +51,7 @@ class Portable
       sub_type_id = field[:type].to_i
       sub_type = @all_portable_hash[sub_type_id]
       if sub_type.nil?
-        sub_type = deal_one_si_type(portables, sub_type_id)
+        sub_type = deal_one_si_type(portables, sub_type_id, true)
       end
       type_mapping << [field[:name], sub_type]
     end
@@ -73,7 +73,7 @@ class Portable
     end
     sub_type = @all_portable_hash[sub_type_id]
     if sub_type.nil?
-      sub_type = deal_one_si_type(portables, sub_type_id)
+      sub_type = deal_one_si_type(portables, sub_type_id, true)
     end
     @all_portable_hash[portable[:id].to_i] = "[#{sub_type}; #{portable[:type][:def][:Array][:len]}]"
     "[#{sub_type}; #{portable[:type][:def][:Array][:len]}]"
@@ -84,7 +84,7 @@ class Portable
     sub_type_id = portable[:type][:def][:Sequence][:type].to_i
     sub_type = @all_portable_hash[sub_type_id]
     if sub_type.nil?
-      sub_type = deal_one_si_type(portables, sub_type_id)
+      sub_type = deal_one_si_type(portables, sub_type_id, true)
     end
     @all_portable_hash[id] = "Vec<#{sub_type}>"
     return @all_portable_hash[id]
@@ -92,20 +92,21 @@ class Portable
   
   def expand_tuple (portables, id)
     portable = portables[id]
-    if portable[:type][:def][:Tuple].nil?
-      return "Null"
+    if portable[:type][:def][:Tuple].nil? || portable[:type][:def][:Tuple].size == 0
+      @all_portable_hash[id] = "Null"
+      return @all_portable_hash[id]
     end
     tuples = []
     portable[:type][:def][:Tuple].each_with_index do |field, index|
       sub_type_id = field.to_i
       sub_type = @all_portable_hash[sub_type_id]
       if sub_type.nil?
-        sub_type = deal_one_si_type(portables, sub_type_id)
+        sub_type = deal_one_si_type(portables, sub_type_id, true)
       end
       tuples << sub_type
     end
     # Scale::Types.get(struct)
-    name = "Tuple" + tuples.join(",")
+    name = "Tuple:" + tuples.join(",")
     struct = "(#{tuples.join(',')})"
     Scale::TypeRegistry.instance.add_custom_type({name => struct})
     @all_portable_hash[id] = name
@@ -117,7 +118,7 @@ class Portable
     sub_type_id = portable[:type][:def][:Compact][:type].to_i
     sub_type = @all_portable_hash[sub_type_id]
     if sub_type.nil?
-      sub_type = deal_one_si_type(portables, sub_type_id)
+      sub_type = deal_one_si_type(portables, sub_type_id, true)
     end
     @all_portable_hash[id] = "Compact<#{sub_type}>"
     return @all_portable_hash[id]
@@ -128,7 +129,7 @@ class Portable
     sub_type_id = portable[:type][:params][0][:type].to_i
     sub_type = @all_portable_hash[sub_type_id]
     if sub_type.nil?
-      sub_type = deal_one_si_type(portables, sub_type_id)
+      sub_type = deal_one_si_type(portables, sub_type_id, true)
     end
     @all_portable_hash[id] = "Option<#{sub_type}>"
     return @all_portable_hash[id]
@@ -139,12 +140,12 @@ class Portable
     sub_type_id = portable[:type][:params][0][:type].to_i
     sub_type = @all_portable_hash[sub_type_id]
     if sub_type.nil?
-      sub_type = deal_one_si_type(portables, sub_type_id)
+      sub_type = deal_one_si_type(portables, sub_type_id, true)
     end
     err_type_id = portable[:type][:params][1][:type].to_i
     err_type = @all_portable_hash[err_type_id]
     if err_type.nil?
-      err_type = deal_one_si_type(portables, err_type_id)
+      err_type = deal_one_si_type(portables, err_type_id, true)
     end
     @all_portable_hash[id] = "Results<#{sub_type},#{err_type}>"
     return @all_portable_hash[id]
@@ -152,7 +153,8 @@ class Portable
   
   def expand_enum portables, id
     portable = portables[id]
-    type_name = "null"
+    puts portable.inspect
+   
     value_enum = false
     enum_value_list = []
     types = []
@@ -160,6 +162,7 @@ class Portable
   
     portable[:type][:def][:Variant][:variants].each_with_index do |variant, index|
       struct_types = []
+      type_name = "Null"
       if variant[:fields].size == 0
         enum_value_list << [variant[:name], "#{variant[:index]}"]
       elsif variant[:fields].size == 1
@@ -167,7 +170,7 @@ class Portable
         sub_type_id = variant[:fields][0][:type].to_i
         sub_type = @all_portable_hash[sub_type_id]
         if sub_type.nil?
-          sub_type = deal_one_si_type(portables, sub_type_id)
+          sub_type = deal_one_si_type(portables, sub_type_id, true)
         end
         type_name = sub_type
       else
@@ -176,18 +179,27 @@ class Portable
           sub_type_id = field[:type].to_i
           sub_type = @all_portable_hash[sub_type_id]
           if sub_type.nil?
-            sub_type = deal_one_si_type(portables, sub_type_id)
+            sub_type = deal_one_si_type(portables, sub_type_id, true)
           end
   
-          if field[:name] == ""
+          if field[:name].nil?
             field[:name] = "col#{index}"
           end
-  
-          struct_types << [field[:name], sub_type]
+
+          struct_types << [field[:name], fix_name(sub_type)]
+          type_name = type_name + "_" + field[:name] + "_" + field[:type].to_s
         end
-  
+        
         if struct_types.size > 0
-          type_name = struct_types.to_s
+            puts 2222223234234
+          puts type_name
+          struct = {
+            "type" => "struct",
+            "type_mapping":struct_types
+          }
+          Scale::TypeRegistry.instance.add_custom_type({type_name => struct})
+          puts Scale::Types.get(type_name)
+          puts 11111
         end
       end
   
@@ -205,15 +217,18 @@ class Portable
     end
   
     if !value_enum
-          types = enum_value_list
+      types = enum_value_list
     end
     typeString = name_si_type(portables, id)
     @all_portable_hash[id] = typeString
-    struct = {
+    enum = {
       "type" => "enum",
       "type_mapping":types
     }
-    Scale::TypeRegistry.instance.add_custom_type({typeString => struct})
+    puts typeString
+    puts enum.inspect
+    Scale::TypeRegistry.instance.add_custom_type({typeString => enum})
+    puts Scale::Types.get(typeString)
     return @all_portable_hash[id]
   end
   
@@ -272,7 +287,7 @@ class Portable
       if len >=2 && portable[:type][:path][len -2] == "pallet" && portable[:type][:path][len -1] == "Call"
         @all_portable_hash[id] = "Call"
         return @all_portable_hash[id]
-      elsif !["Call", "Event"].include?(portable[:type][:path][len -1])
+      elsif ["Call", "Event"].include?(portable[:type][:path][len -1])
         @all_portable_hash[id] = "Call"
         return @all_portable_hash[id]
       else
@@ -287,10 +302,11 @@ class Portable
   def name_si_type(portables, id)
     portable = portables[id]
     unless portable[:type][:def][:Composite].nil?
-      return (portable[:type][:path].join(':')  + "_#{id}").capitalize
+      return (portable[:type][:path].join('_')  + "_#{id}")
     end
   
     unless portable[:type][:def][:Variant].nil?
+      
       special_variant = portable[:type][:path][0]
   
       if special_variant.downcase == "option" || special_variant.downcase == "result"
@@ -300,12 +316,35 @@ class Portable
       len = portable[:type][:path].size
       if len >=2 && portable[:type][:path][len -2] == "pallet" && portable[:type][:path][len -1] == "Call"
         return ""
-      elsif !["Call", "Event"].include?(portable[:type][:path][len -1])
+      elsif ["Call", "Event"].include?(portable[:type][:path][len -1])
         return ""
       else
-        return portable[:type][:path].join(':').capitalize
+        return portable[:type][:path].join('_')
       end
     end
     return ""
+  end
+
+  def fix_name(type)
+    type = type.gsub("T::", "")
+      .gsub("<T>", "")
+      .gsub("<T as Trait>::", "")
+      .delete("\n")
+      .gsub(/(u)(\d+)/, 'U\2')
+    return "Bool" if type == "bool"
+    return "Null" if type == "()"
+    return "String" if type == "Vec<u8>"
+    return "Compact" if type == "Compact<u32>" || type == "Compact<U32>"
+    return "Address" if type == "<Lookup as StaticLookup>::Source"
+    return "Compact" if type == "<Balance as HasCompact>::Type"
+    return "Compact" if type == "<BlockNumber as HasCompact>::Type"
+    return "Compact" if type =~ /\ACompact<[a-zA-Z0-9\s]*>\z/
+    return "CompactMoment" if type == "<Moment as HasCompact>::Type"
+    return "CompactMoment" if type == "Compact<Moment>"
+    return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
+    return "AccountData" if type == "AccountData<Balance>"
+    return "EventRecord" if type == "EventRecord<Event, Hash>"
+
+    type
   end
 end

@@ -26,8 +26,16 @@ module Scale
         end
       
         modules = Scale::Types.get("Vec<MetadataV14Module>").decode(scale_bytes).value
-        result = Scale::Types.get("MetadataV14").new(modules)
-        
+      
+        value = {
+          magicNumber: 1_635_018_093,
+          metadata: {
+            version: 14,
+            modules: modules.map(&:value)
+          }
+        }
+
+        result = MetadataV14.new(value)
         call_module_index = 0
         event_module_index = 0
 
@@ -49,6 +57,12 @@ module Scale
             end
             m[:calls] = calls
             m[:calls].each_with_index do |call, index|
+              # puts 22222
+              # puts m.inspect
+              # puts "-------"
+              # puts call.inspect
+              # puts 11111
+              # puts "%02x%02x" % [m[:index], index]
               m[:calls][index][:lookup] = "%02x%02x" % [m[:index], index]
               result.call_index[call[:lookup]] = [m, call]
             end
@@ -120,6 +134,9 @@ module Scale
         extrinsic = Scale::Types.get("ExtrinsicMetadataV14").decode(scale_bytes).value
         result.extrinsic = extrinsic
         result.all_portable_hash = all_portable_hash
+        # puts all_portable_hash.inspect
+        puts 222222
+        puts Scale::Types.get("sp_runtime_multiaddress_MultiAddress")
         result
       end
     end
