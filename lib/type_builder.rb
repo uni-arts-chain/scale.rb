@@ -15,10 +15,7 @@ module Scale
 
           # find the final type from registry
           type_info = fix_name(type_info)
-          Scale::Types.logger.error type_info
           type_info = get_final_type_from_registry(type_info)
-          Scale::Types.logger.error "------"
-          Scale::Types.logger.error type_info
         end
 
         build_type(type_info)
@@ -38,8 +35,6 @@ module Scale
             elsif type_info =~ /\A\(.+\)\z/
               build_tuple(type_string)
             else
-              Scale::Types.logger.error "--1111----"
-          Scale::Types.logger.error type_string
               get_hard_coded_type(type_string)
             end
 
@@ -170,11 +165,14 @@ module Scale
             [item_name, item_type]
           end.to_h
 
+         
           partials = []
           items.each_pair do |item_name, item_type|
             partials << item_name.camelize2 + 'In' + item_type.name.gsub('Scale::Types::', '') 
           end
           type_name = "Struct_#{partials.join('_')}_"
+          items = items.transform_keys!(&:to_sym)
+
 
           if !Scale::Types.const_defined?(type_name)
             klass = Class.new do
@@ -194,7 +192,6 @@ module Scale
             # items: {a: Type}
             items = type_info[:type_mapping].map do |item|
               item_name = item[0]
-              Scale::Types.logger.error item[1]
               item_type = get(item[1])
               [item_name.to_sym, item_type]
             end.to_h

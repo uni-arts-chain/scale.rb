@@ -35,6 +35,8 @@ describe Scale::Types::Metadata do
 
   it "get scale info" do
     hex = get_metadata_hex(14)
+    puts 22222
+    puts Scale::Types.get("SiLookupTypeId").inspect
     scale_bytes = Scale::Bytes.new(hex)
     metadata = Scale::Types::Metadata.decode(scale_bytes)
     expect(metadata).to eql(nil)

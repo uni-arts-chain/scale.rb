@@ -994,15 +994,15 @@ module Scale
       end
     end
 
-    class SiField
-      include Struct
-      items(
-        name: "Option<String>",
-        type: 'SiLookupTypeId',
-        typeName: 'Option<String>',
-        docs: 'Vec<String>'
-      )
-    end
+    # class SiField
+    #   include Struct
+    #   items(
+    #     name: "Option<String>",
+    #     type: 'SiLookupTypeId',
+    #     typeName: 'Option<String>',
+    #     docs: 'Vec<String>'
+    #   )
+    # end
 
     class MetadataV14ModuleConstant
       include Struct

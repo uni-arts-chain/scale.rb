@@ -47,11 +47,14 @@ class Portable
     end
   
     type_mapping = []
-    composite[:fields].each do |field|
+    composite[:fields].each_with_index do |field, index|
       sub_type_id = field[:type].to_i
       sub_type = @all_portable_hash[sub_type_id]
       if sub_type.nil?
         sub_type = deal_one_si_type(portables, sub_type_id, true)
+      end
+      if field[:name].nil?
+        field[:name] = "col#{index}"
       end
       type_mapping << [field[:name], sub_type]
     end
@@ -153,12 +156,11 @@ class Portable
   
   def expand_enum portables, id
     portable = portables[id]
-    puts portable.inspect
    
     value_enum = false
     enum_value_list = []
     types = []
-    portable[:type][:def][:Variant][:variants].sort_by {|variant| variant[:index]}
+    portable[:type][:def][:Variant][:variants] = portable[:type][:def][:Variant][:variants].sort_by {|variant| variant[:index]}
   
     portable[:type][:def][:Variant][:variants].each_with_index do |variant, index|
       struct_types = []
@@ -191,15 +193,11 @@ class Portable
         end
         
         if struct_types.size > 0
-            puts 2222223234234
-          puts type_name
           struct = {
             "type" => "struct",
             "type_mapping":struct_types
           }
           Scale::TypeRegistry.instance.add_custom_type({type_name => struct})
-          puts Scale::Types.get(type_name)
-          puts 11111
         end
       end
   
@@ -217,7 +215,7 @@ class Portable
     end
   
     if !value_enum
-      types = enum_value_list
+      types = []
     end
     typeString = name_si_type(portables, id)
     @all_portable_hash[id] = typeString
@@ -225,22 +223,19 @@ class Portable
       "type" => "enum",
       "type_mapping":types
     }
-    puts typeString
-    puts enum.inspect
     Scale::TypeRegistry.instance.add_custom_type({typeString => enum})
-    puts Scale::Types.get(typeString)
     return @all_portable_hash[id]
   end
   
   def deal_one_si_type portables, id, recursive=false
     portable = portables[id]
   
-    if recursive
-      si_type_name = name_si_type portables, id
-      if si_type_name != ""
-        return si_type_name
-      end
-    end
+    # if recursive
+    #   si_type_name = name_si_type portables, id
+    #   if si_type_name != ""
+    #     return si_type_name
+    #   end
+    # end
   
     unless portable[:type][:def][:Composite].nil?
       return expand_composite portables, id

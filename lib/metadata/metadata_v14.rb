@@ -42,10 +42,9 @@ module Scale
         origin_callers = []
         modules.map(&:value).each do |m|
           origin_callers << {name: m[:name], index: m[:index]}
-          
           if m[:calls]
             calls = []
-            variants = portables_to_hash[m[:calls]["type"].value][:type][:def][:Variant][:variants]
+            variants = portables_to_hash[m[:calls][:type].value][:type][:def][:Variant][:variants]
             raise "call value not variant" if variants.nil?
 
             variants.each do |variant|
@@ -57,12 +56,6 @@ module Scale
             end
             m[:calls] = calls
             m[:calls].each_with_index do |call, index|
-              # puts 22222
-              # puts m.inspect
-              # puts "-------"
-              # puts call.inspect
-              # puts 11111
-              # puts "%02x%02x" % [m[:index], index]
               m[:calls][index][:lookup] = "%02x%02x" % [m[:index], index]
               result.call_index[call[:lookup]] = [m, call]
             end
@@ -71,7 +64,7 @@ module Scale
 
           if m[:events]
             calls = []
-            variants = portables_to_hash[m[:events]["type"].value][:type][:def][:Variant][:variants]
+            variants = portables_to_hash[m[:events][:type].value][:type][:def][:Variant][:variants]
             raise "call value not variant" if variants.nil?
 
             variants.each do |variant|
@@ -90,7 +83,7 @@ module Scale
 
           if m[:errors]
             calls = []
-            variants = portables_to_hash[m[:errors]["type"].value][:type][:def][:Variant][:variants]
+            variants = portables_to_hash[m[:errors][:type].value][:type][:def][:Variant][:variants]
             raise "call value not variant" if variants.nil?
 
             variants.each do |variant|
@@ -134,9 +127,6 @@ module Scale
         extrinsic = Scale::Types.get("ExtrinsicMetadataV14").decode(scale_bytes).value
         result.extrinsic = extrinsic
         result.all_portable_hash = all_portable_hash
-        # puts all_portable_hash.inspect
-        puts 222222
-        puts Scale::Types.get("sp_runtime_multiaddress_MultiAddress")
         result
       end
     end

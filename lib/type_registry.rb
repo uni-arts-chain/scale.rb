@@ -5,17 +5,18 @@ module Scale
 
     # init by load, and will not change
     attr_reader :spec_name, :types
-    attr_reader :versioning, :custom_types # optional
+    attr_reader :versioning # optional
 
     # will change by different spec version
     attr_accessor :spec_version # optional
     attr_accessor :metadata
+    attr_accessor :custom_types
 
     def load(spec_name: nil, custom_types: nil)
       @spec_name = nil
       @types = nil
       @versioning = nil
-      @custom_types = nil
+      @custom_types = @custom_types || nil
 
       default_types, _, _ = load_chain_spec_types("default")
 
@@ -34,7 +35,11 @@ module Scale
         @types = default_types
       end
 
-      self.custom_types = custom_types
+      if @custom_types.nil?
+        @custom_types = custom_types
+      else
+        @custom_types.merge!(custom_types)
+      end
       true
     end
 
@@ -43,13 +48,13 @@ module Scale
       type_traverse(type_name, all_types)
     end
 
-    def custom_types=(custom_types)
-      @custom_types = custom_types.stringify_keys if (not custom_types.nil?) && custom_types.class.name == "Hash"
-    end
+    # def custom_types=(custom_types)
+    #   @custom_types = custom_types.stringify_keys if (not custom_types.nil?) && custom_types.class.name == "Hash"
+    # end
 
     def add_custom_type custom_type
-      custom_type = custom_type.stringify_keys if (not custom_type.nil?) && custom_type.class.name == "Hash"
-      if @custom_type
+      #custom_type = custom_type.transform_keys(&:to_sym) if (not custom_type.nil?) && custom_type.class.name == "Hash"
+      if !@custom_types.nil?
         @custom_types.merge!(custom_type)
       else
         @custom_types = custom_type
