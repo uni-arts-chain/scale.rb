@@ -4,13 +4,14 @@ module Scale
   module Types
     class MetadataV14
       include Base
-      attr_accessor :call_index, :event_index, :extrinsic, :all_portable_hash
+      attr_accessor :call_index, :event_index, :extrinsic, :portables_to_hash, :all_portable_hash
 
       def initialize(value)
         @call_index = {}
         @event_index = {}
         @extrinsic = nil
         @all_portable_hash = {}
+        @portables_to_hash = {}
         super(value)
       end
 
@@ -20,10 +21,15 @@ module Scale
         portable = Portable.new
         portable.compact_all_types portables_to_human
         all_portable_hash = portable.all_portable_hash
+        puts "-----"
+        puts all_portable_hash.inspect
+       
         portables_to_hash = {}
         portables_to_human.each do |portable|
-          portables_to_hash[portable[:id]] = portable
+          portables_to_hash[portable[:id]] = all_portable_hash
         end
+        puts "----1111----"
+        puts portables_to_hash.inspect
       
         modules = Scale::Types.get("Vec<MetadataV14Module>").decode(scale_bytes).value
       

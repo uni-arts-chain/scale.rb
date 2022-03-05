@@ -8,7 +8,6 @@ module Scale::Types
     before(:all) {
       Scale::TypeRegistry.instance.load(spec_name: "kusama")
       Scale::TypeRegistry.instance.spec_version = 1045
-      Scale::TypeRegistry.instance.add_custom_type({"aaaa" => "U32"})
       hex = File.open(File.join(ROOT, "spec", "metadata", "v14", "hex")).read.strip
       scale_bytes = Scale::Bytes.new(hex)
       metadata = Scale::Types::Metadata.decode scale_bytes

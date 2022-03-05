@@ -33,13 +33,113 @@ describe Scale::Types::Metadata do
     expect(v.to_json).to eql(expected.to_json)
   end
 
+    # The data copy from polkadot-js/api about type and hasher has some errors,
+  # so I did not test these.
+  [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13].each do |v|
+    # [13].each do |v|
+    it "can decode v#{v} hex data" do
+      hex = get_metadata_hex(v)
+      scale_bytes = Scale::Bytes.new(hex)
+      metadata = Scale::Types::Metadata.decode scale_bytes
+      md = metadata.value.value[:metadata]
+      mods = md[:modules]
+
+      expected = get_metadata(v)[:metadata]["V#{v}".to_sym]
+      mods_expected = expected[:modules]
+
+      expect(metadata.version).to eql(v)
+
+      mods.each_with_index do |mod, i|
+        mod_expected = mods_expected[i]
+
+        mod[:events]&.each_with_index do |event, j|
+          event_expected = mod_expected[:events][j]
+          expect(event[:name]).to eql(event_expected[:name])
+          expect(event[:documentation]).to eql(event_expected[:documentation])
+        end
+
+        mod[:calls]&.each_with_index do |call, j|
+          call_expected = mod_expected[:calls][j]
+          expect(call[:name]).to eql(call_expected[:name])
+          expect(call[:documentation]).to eql(call_expected[:documentation])
+        end
+
+        if not mod[:storage].nil?
+          if mod[:storage].class.name == "Hash"
+            storages = mod[:storage][:items]
+            storages_expected = mod_expected[:storage][:items]
+          else
+            storages = mod[:storage]
+            storages_expected = mod_expected[:storage]
+          end
+
+          storages.each_with_index do |storage, j|
+            storage_expected = storages_expected[j]
+            expect(storage[:name]).to eql(storage_expected[:name])
+            expect(storage[:modifier]).to eql(storage_expected[:modifier])
+            expect(storage[:fallback]).to eql(storage_expected[:fallback])
+            expect(storage[:documentation]).to eql(storage_expected[:documentation])
+          end
+        end
+      end
+    end
+  end
+
   it "get scale info" do
     hex = get_metadata_hex(14)
-    puts 22222
-    puts Scale::Types.get("SiLookupTypeId").inspect
     scale_bytes = Scale::Bytes.new(hex)
     metadata = Scale::Types::Metadata.decode(scale_bytes)
-    expect(metadata).to eql(nil)
+    
+    md = metadata.value.value[:metadata]
+    mods = md[:modules]
+
+    mods_expected = get_metadata(14)[:pallets]
+    
+    mods.each_with_index do |mod, i|
+      mod_expected = mods_expected[i]
+      puts "111111"
+      puts mod_expected.inspect
+      mod[:events]&.each_with_index do |event, j|
+       puts 222222
+       puts event.inspect
+        event_expected = mod_expected[:events][j]
+        expect(event[:name]).to eql(event_expected[:name])
+        expect(event[:documentation]).to eql(event_expected[:documentation])
+      end
+
+      mod[:calls]&.each_with_index do |call, j|
+        call_expected = mod_expected[:calls][j]
+        expect(call[:name]).to eql(call_expected[:name])
+        expect(call[:documentation]).to eql(call_expected[:documentation])
+      end
+
+      if not mod[:storage].nil?
+        if mod[:storage].class.name == "Hash"
+          storages = mod[:storage][:items]
+          storages_expected = mod_expected[:storage][:items]
+        else
+          storages = mod[:storage]
+          storages_expected = mod_expected[:storage]
+        end
+
+        storages.each_with_index do |storage, j|
+          storage_expected = storages_expected[j]
+          expect(storage[:name]).to eql(storage_expected[:name])
+          expect(storage[:modifier]).to eql(storage_expected[:modifier])
+          expect(storage[:fallback]).to eql(storage_expected[:fallback])
+          expect(storage[:documentation]).to eql(storage_expected[:documentation])
+        end
+      end
+    end
+
+    expect(metadata.version).to eql(14)
+    expect(metadata.value.all_portable_hash).not_to eql(nil)
+
+ 
+
+
+    
+
   end
 
 end
