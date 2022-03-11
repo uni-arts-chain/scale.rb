@@ -22,6 +22,10 @@ def ws_request(url, payload)
     ws.on :close do |event|
       ws = nil
     end
+
+    ws.on :error do |event|
+      EM.stop
+    end
   end
 
   result
@@ -51,7 +55,9 @@ class SubstrateClient
     }
 
     data = ws_request(@url, payload)
-    if data["error"]
+    if data.nil?
+      raise @url, payload.inspect, "url:#{@url}, payload: #{payload.inspect}, data: #{data.inspect}"
+    elsif data["error"]
       raise RpcError, data["error"]
     else
       data["result"]
