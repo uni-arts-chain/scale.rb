@@ -28,7 +28,15 @@ def ws_request(url, payload)
     end
   end
 
+  result = http_request(url, payload) if result.nil?
   result
+end
+
+def http_request(url, payload)
+  r = RestClient.post(url, payload.to_json, { content_type: :json, accept: :json })
+  JSON.parse(r.body)
+rescue => ex
+  { "error": ex.message }
 end
 
 class SubstrateClient
