@@ -1,11 +1,11 @@
 require "faye/websocket"
 require "eventmachine"
 
-def ws_request(url, payload)
+def ws_request(ws_url, payload, http_url)
   result = nil
 
   EM.run do
-    ws = Faye::WebSocket::Client.new(url)
+    ws = Faye::WebSocket::Client.new(ws_url)
 
     ws.on :open do |event|
       ws.send(payload.to_json)
@@ -28,12 +28,12 @@ def ws_request(url, payload)
     end
   end
 
-  result = http_request(url, payload) if result.nil?
+  result = http_request(http_url, payload) if result.nil? && http_url.present?
   result
 end
 
-def http_request(url, payload)
-  r = RestClient.post(url, payload.to_json, { content_type: :json, accept: :json })
+def http_request(http_url, payload)
+  r = RestClient.post(http_url, payload.to_json, { content_type: :json, accept: :json })
   JSON.parse(r.body)
 rescue => ex
   { "error": ex.message }
@@ -47,8 +47,9 @@ class SubstrateClient
   attr_reader :metadata
   attr_reader :spec_name, :spec_version
 
-  def initialize(url)
-    @url = url
+  def initialize(ws_url, http_url = nil)
+    @ws_url = ws_url
+    @http_url = http_url
     @request_id = 1
     @metadata_cache = {}
     init_types_and_metadata
@@ -62,9 +63,9 @@ class SubstrateClient
       "id" => @request_id
     }
 
-    data = ws_request(@url, payload)
+    data = ws_request(@ws_url, payload, @http_url)
     if data.nil?
-      raise @url, payload.inspect, "url:#{@url}, payload: #{payload.inspect}, data: #{data.inspect}"
+      raise @ws_url, payload.inspect, "url:#{@ws_url}, payload: #{payload.inspect}, data: #{data.inspect}"
     elsif data["error"]
       raise RpcError, data["error"]
     else
