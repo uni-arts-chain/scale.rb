@@ -30,6 +30,9 @@ def ws_request(ws_url, payload, http_url)
 
   result = http_request(http_url, payload) if result.nil? && http_url.present?
   result
+rescue
+  return nil if http_url.blank?
+  http_request(http_url, payload)
 end
 
 def http_request(http_url, payload)
