@@ -66,7 +66,7 @@ class SubstrateClient
       "id" => @request_id
     }
 
-    data = ws_request(@ws_url, payload, @http_url)
+    data = http_request(@http_url, payload)
     if data.nil?
       raise @ws_url, payload.inspect, "url:#{@ws_url}, payload: #{payload.inspect}, data: #{data.inspect}"
     elsif data["error"]
