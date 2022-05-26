@@ -22,7 +22,7 @@
                 ],
                 [
                     "fee_frozen",
-                    "H160"
+                    "Balance"
                 ]
             ]
         },
