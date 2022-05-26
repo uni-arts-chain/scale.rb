@@ -69,8 +69,14 @@
     "PriorLock": {
       "type": "struct",
       "type_mapping": [
-         ["blockNumber", "BlockNumber"],
-         ["balance", "Balance"]
+        [
+          "blockNumber",
+          "BlockNumber"
+        ],
+        [
+          "balance",
+          "Balance"
+        ]
       ]
     },
     "ReferendumInfoFinished": {
@@ -144,8 +150,14 @@
     "VotingDirectVote": {
       "type": "struct",
       "type_mapping": [
-         ["referendumIndex", "ReferendumIndex"],
-         ["accountVote", "AccountVote"]
+        [
+          "referendumIndex",
+          "ReferendumIndex"
+        ],
+        [
+          "accountVote",
+          "AccountVote"
+        ]
       ]
     },
     "VotingDirect": {
@@ -252,15 +264,20 @@
         ]
       ]
     },
-    "AccountInfo<Index, AccountData>": {
+    "AccountInfo<Index, AccountData>": "AccountInfoWithDualRefCount",
+    "AccountInfoWithDualRefCount": {
       "type": "struct",
       "type_mapping": [
         [
           "nonce",
-          "Index"
+          "u32"
         ],
         [
-          "c",
+          "consumers",
+          "RefCount"
+        ],
+        [
+          "providers",
           "RefCount"
         ],
         [
@@ -376,16 +393,31 @@
     "FullIdentification": {
       "type": "struct",
       "type_mapping": [
-         ["total", "Compact<Balance>"],
-         ["own", "Compact<Balance>"],
-         ["others", "Vec<IndividualExposure>"]
+        [
+          "total",
+          "Compact<Balance>"
+        ],
+        [
+          "own",
+          "Compact<Balance>"
+        ],
+        [
+          "others",
+          "Vec<IndividualExposure>"
+        ]
       ]
     },
     "IdentificationTuple": {
       "type": "struct",
       "type_mapping": [
-         ["validatorId", "ValidatorId"],
-         ["exposure", "FullIdentification"]
+        [
+          "validatorId",
+          "ValidatorId"
+        ],
+        [
+          "exposure",
+          "FullIdentification"
+        ]
       ]
     },
     "SetId": "u64",
@@ -408,8 +440,14 @@
     "NextAuthority": {
       "type": "struct",
       "type_mapping": [
-         ["AuthorityId", "AuthorityId"],
-         ["weight", "AuthorityWeight"]
+        [
+          "AuthorityId",
+          "AuthorityId"
+        ],
+        [
+          "weight",
+          "AuthorityWeight"
+        ]
       ]
     },
     "AuthorityList": "Vec<NextAuthority>",
@@ -572,8 +610,14 @@
     "IdentityInfoAdditional": {
       "type": "struct",
       "type_mapping": [
-         ["field", "Data"],
-         ["value", "Data"]
+        [
+          "field",
+          "Data"
+        ],
+        [
+          "value",
+          "Data"
+        ]
       ]
     },
     "IdentityInfo": {
@@ -946,8 +990,14 @@
     "RegistrationJudgement": {
       "type": "struct",
       "type_mapping": [
-         ["registrarIndex", "RegistrarIndex"],
-         ["judgement", "Judgement"]
+        [
+          "registrarIndex",
+          "RegistrarIndex"
+        ],
+        [
+          "judgement",
+          "Judgement"
+        ]
       ]
     },
     "Registration": {
@@ -1272,8 +1322,14 @@
     "UnappliedSlashOther": {
       "type": "struct",
       "type_mapping": [
-         ["account", "AccountId"],
-         ["amount", "Balance"]
+        [
+          "account",
+          "AccountId"
+        ],
+        [
+          "amount",
+          "Balance"
+        ]
       ]
     },
     "UnappliedSlash<AccountId, BalanceOf>": {
@@ -1659,17 +1715,29 @@
     "OffchainAccuracyCompact": "Compact<OffchainAccuracy>",
     "CompactScoreCompact": {
       "type": "struct",
-        "type_mapping": [
-          ["validatorIndex", "ValidatorIndexCompact"],
-          ["offchainAccuracy", "OffchainAccuracyCompact"]
+      "type_mapping": [
+        [
+          "validatorIndex",
+          "ValidatorIndexCompact"
+        ],
+        [
+          "offchainAccuracy",
+          "OffchainAccuracyCompact"
         ]
+      ]
     },
     "CompactScore": {
       "type": "struct",
-        "type_mapping": [
-          ["validatorIndex", "ValidatorIndex"],
-          ["offchainAccuracy", "OffchainAccuracy"]
+      "type_mapping": [
+        [
+          "validatorIndex",
+          "ValidatorIndex"
+        ],
+        [
+          "offchainAccuracy",
+          "OffchainAccuracy"
         ]
+      ]
     },
     "CompactAssignmentsFrom258": {
       "type": "struct",
@@ -1812,11 +1880,20 @@
     "CompactAssignments": "CompactAssignmentsTo257",
     "DeferredOffenceOf": {
       "type": "struct",
-        "type_mapping": [
-          ["offences", "Vec<OffenceDetails>"],
-          ["perc", "Vec<Perbill>"],
-          ["session", "SessionIndex"]
+      "type_mapping": [
+        [
+          "offences",
+          "Vec<OffenceDetails>"
+        ],
+        [
+          "perc",
+          "Vec<Perbill>"
+        ],
+        [
+          "session",
+          "SessionIndex"
         ]
+      ]
     },
     "Statement": {
       "type": "enum",
@@ -2009,8 +2086,14 @@
     "TaskAddress": {
       "type": "struct",
       "type_mapping": [
-        ["blockNumber", "BlockNumber"],
-        ["index", "u32"]
+        [
+          "blockNumber",
+          "BlockNumber"
+        ],
+        [
+          "index",
+          "u32"
+        ]
       ]
     },
     "ValidationFunctionParams": {

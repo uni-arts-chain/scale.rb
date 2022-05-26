@@ -27,6 +27,7 @@
             ]
         },
         "AccountInfo": "AccountInfoWithDualRefCount",
+        "AccountInfo<Index, AccountData>": "AccountInfoWithDualRefCount",
         "AccountInfoWithDualRefCount": {
             "type": "struct",
             "type_mapping": [
