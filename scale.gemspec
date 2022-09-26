@@ -37,8 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "xxhash"
   spec.add_dependency "base58"
   spec.add_dependency "json", "~> 2.3.0"
-  spec.add_dependency "faye-websocket"
-  spec.add_dependency "thor", '~> 0.19'
+  spec.add_dependency "thor"
   spec.add_dependency "rest-client"
 
   spec.add_development_dependency "bundler"

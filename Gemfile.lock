@@ -4,10 +4,9 @@ PATH
     scale.rb (0.2.38)
       base58
       blake2b
-      faye-websocket
       json (~> 2.3.0)
       rest-client
-      thor (~> 0.19)
+      thor
       xxhash
 
 GEM
@@ -19,13 +18,9 @@ GEM
     diff-lcs (1.4.4)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    eventmachine (1.2.7)
-    faye-websocket (0.11.1)
-      eventmachine (>= 0.12.0)
-      websocket-driver (>= 0.5.1)
     ffi (1.15.0)
     http-accept (1.7.0)
-    http-cookie (1.0.4)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     json (2.3.1)
     method_source (1.0.0)
@@ -55,14 +50,11 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
-    thor (0.20.3)
+    thor (1.2.1)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8.1)
-    websocket-driver (0.7.5)
-      websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.5)
-    xxhash (0.4.0)
+    unf_ext (0.0.8.2)
+    xxhash (0.5.0)
 
 PLATFORMS
   ruby
@@ -76,4 +68,4 @@ DEPENDENCIES
   scale.rb!
 
 BUNDLED WITH
-   2.2.13
+   2.2.32
